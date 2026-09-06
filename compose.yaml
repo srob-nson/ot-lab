@@ -1,0 +1,65 @@
+services:
+
+  modbus-plc:
+    build:
+      context: ./modbus/server
+    container_name: modbus-plc
+    networks:
+      ot:
+        ipv4_address: 10.20.0.10
+
+  modbus-client:
+    build:
+      context: ./modbus/client
+    container_name: modbus-client
+    depends_on:
+      - modbus-plc
+    networks:
+      ot:
+        ipv4_address: 10.20.0.11
+
+  bacnet-plc:
+    build:
+      context: ./bacnet/device
+    container_name: bacnet-device
+    networks:
+      ot:
+        ipv4_address: 10.20.0.20
+
+  bacnet-client:
+    build:
+      context: ./bacnet/client
+    container_name: bacnet-client
+    depends_on:
+      - bacnet-plc
+    networks:
+      ot:
+        ipv4_address: 10.20.0.21
+
+  enip-device:
+    build:
+      context: ./enip/device
+    container_name: enip-device
+    networks:
+      ot:
+        ipv4_address: 10.20.0.30
+
+  enip-client:
+    build:
+      context: ./enip/client
+    container_name: enip-client
+    depends_on:
+      - enip-device
+    networks:
+      ot:
+        ipv4_address: 10.20.0.31
+
+networks:
+  # This external Docker bridge is the lab's OT LAN.  Containers on it can
+  # reach each other by their static addresses without publishing host ports.
+  ot:
+    external: true
+    name: ot-net
+    ipam:
+      config:
+        - subnet: 10.20.0.0/24
