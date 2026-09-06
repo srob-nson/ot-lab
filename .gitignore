@@ -1,13 +1,17 @@
- __pycache__/
-  *.py[cod]
+__pycache__/
+*.py[cod]
+bacnet/client/__pycache__
+bacnet/device/__pycache__
+modbus/server/__pycache__
 
-  .env
-  .env.*
-  !.env.example
 
-  .venv/
-  venv/
+.env
+.env.*
+!.env.example
 
-  *.log
-  *.pcap
-  *.pcapng
+.venv/
+venv/
+
+*.log
+*.pcap
+*.pcapng
