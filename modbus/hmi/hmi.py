@@ -1,32 +1,31 @@
 import os
 import time
 
-from cpppo.server.enip import client
+from pymodbus.client import ModbusTcpClient
 
-
-DEVICE_ADDRESS = os.environ.get("ENIP_DEVICE_ADDRESS", "10.20.0.30")
+PLC = os.environ.get("MODBUS_PLC_ADDRESS", "10.20.0.10")
 CYCLE_SECONDS = 5
 
 
 def run_cycle() -> bool:
-    """Send one directed UDP List Identity request and report its product name."""
+    client = ModbusTcpClient(PLC, port=502, timeout=3)
     try:
-        with client.client(host=DEVICE_ADDRESS, udp=True) as connection:
-            connection.list_identity(timeout=2)
-            response, _elapsed = client.await_response(connection, timeout=2)
-
-        if not response:
-            print("EtherNet/IP scanner found no device")
+        if not client.connect():
+            print("Modbus HMI connection failed")
             return False
-        product_name = response.get(
-            "enip.CIP.list_identity.CPF.item[0].identity_object.product_name",
-            "unknown product",
-        )
-        print(f"EtherNet/IP scanner discovered {product_name}")
+
+        response = client.read_holding_registers(address=0, count=4)
+        if response.isError():
+            print(f"Modbus HMI read failed: {response}")
+            return False
+
+        print(f"Modbus HMI registers 0-3={response.registers}")
         return True
     except Exception as error:
-        print(f"EtherNet/IP scanner error: {error}")
+        print(f"Modbus HMI error: {error}")
         return False
+    finally:
+        client.close()
 
 
 def run_loop(cycle_fn=run_cycle, sleep_fn=time.sleep, cycles=None) -> bool:

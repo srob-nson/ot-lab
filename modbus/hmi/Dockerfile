@@ -2,6 +2,6 @@ FROM python:3
 
 RUN pip install --no-cache-dir pymodbus==3.11.3
 
-COPY server.py /server.py
+COPY hmi.py /hmi.py
 
-CMD ["python", "-u", "/server.py"]
+CMD ["python", "-u", "/hmi.py"]

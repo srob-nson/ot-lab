@@ -1,6 +1,6 @@
 FROM python:3
 
-RUN pip install --no-cache-dir pymodbus
+RUN pip install --no-cache-dir cpppo==4.4.3
 
 COPY client.py /client.py
 
